@@ -3,14 +3,14 @@
 #include "item.h"
 #include "Menu.h"
 
-static const float VIEW_HEIGHT = 300.0f; //ustawienie wielko�ci okna
+static const float VIEW_HEIGHT = 300.0f; //ustawienie wielkosci okna
 
 void resizeView(sf::RenderWindow& window, sf::View& view) { //funkcja do skalowania rozmiaru okna
 	float aspectRatio = float(window.getSize().x) / float(window.getSize().y);
 	view.setSize(VIEW_HEIGHT * aspectRatio, VIEW_HEIGHT);
 } 
 
-//je�eli gra jest za trudna, to polecam zmieni� pozycj� pocz�tkow� gracza w jego klasie, �eby omin�� trudno�ci
+//jezeli gra jest za trudna, to polecamy zmienic pozycje poczatkowa gracza w jego klasie, zeby ominac trudnosci
 
 int main() {
 	
@@ -22,19 +22,19 @@ int main() {
 	Menu menu(VIEW_HEIGHT, VIEW_HEIGHT);//menu gry
 
 	bool menu_is_open = true;	//czy gra ma otwarte okno menu
-	bool end = false;			//czy gra ju� si� sko�czy�a
-	int points = 0;				//ilo�� zebranych punkt�w
+	bool end = false;			//czy gra juz sie skomczyla
+	int points = 0;				//ilosc zebranych punktow
 
 
 	sf::Font font;
 
-	if (!font.loadFromFile("Pixel.ttf")) { //[utopiafonts] 1999 free font, � 1999 utopiafonts. dale_thorpe@bssc.edu.au, https://www.1001fonts.com/pixel-font.html
+	if (!font.loadFromFile("Pixel.ttf")) { //[utopiafonts] 1999 free font, 1999 utopiafonts. dale_thorpe@bssc.edu.au, https://www.1001fonts.com/pixel-font.html
 		return 1;
 	}
 
 
 	sf::Text text;
-	//tekst z ilo�ci� punkt�w gracza, kt�ra b�dzie pod��a� w lewym g�rnym rogu
+	//tekst z iloscia punktow gracza, ktara bedzie pod��a� w lewym gornym rogu
 	text.setFont(font);
 	text.setString("Points : " + std::to_string(points));
 	text.setCharacterSize(64);
@@ -43,7 +43,7 @@ int main() {
 	text.setOutlineColor(sf::Color(73, 5, 55));
 	text.setOutlineThickness(3);
 
-	//napis ko�cowy gry
+	//napis koocowy gry
 	sf::Text congrats;
 	congrats.setFont(font);
 	congrats.setString("Contratulations!!!\n You managed to escape\n and get " + std::to_string(points) + " points.");
@@ -56,7 +56,7 @@ int main() {
 	congrats.setOutlineThickness(3);
 
 
-	//tekstury do wykorzystania dla gracza, platform oraz "item�w" do zbierania
+	//tekstury do wykorzystania dla gracza, platform oraz "itemow" do zbierania
 	sf::Texture texture, planeTexture, tileTexture, sTileTexture, rockTexture, monsterTexture; //all textures are from https://s4m-ur4i.itch.io/huge-pixelart-asset-pack I've got acces on itch.io in one of bundles.
 
 	if (!texture.loadFromFile("textures/hero.png")) {
@@ -89,11 +89,11 @@ int main() {
 
 	Hero hero(&texture, sf::Vector2u(4, 3), 0.5f, allAnims, 100.0f, 60.0f);
 
-	//animacja "item�w" / potwork�w
+	//animacja "itemow" / potworkow
 	std::vector<std::vector<int>> monsterAnims;
 	monsterAnims.push_back(std::vector<int>{12, 13, 14, 13});
 
-	//wektor wszystkich platform, kt�ry u�atwi potem wy�wietlanie i sprawdzanie kolizji
+	//wektor wszystkich platform, ktory ulatwi potem wyswietlanie i sprawdzanie kolizji
 	std::vector<Platform> platforms;
 	//tiles
 	platforms.push_back(Platform(&tileTexture, sf::Vector2f(512.0f, 160.0f), sf::Vector2f(256.0f, 800.0f)));
@@ -146,29 +146,25 @@ int main() {
 	platforms.push_back(Platform(&rockTexture, sf::Vector2f(3.0f, 16.0f), sf::Vector2f(340.0f, 150.0f)));
 	
 	
-	//wektor itemk�w / potwork�w
+	//wektor itemkow / potworkow
 	std::vector<Item> items;
 	items.push_back(Item(&monsterTexture, sf::Vector2u(4, 48), 0.5f, monsterAnims, sf::Vector2f(16.0f, 16.0f), sf::Vector2f(152.0f, 624.0f)));
 	items.push_back(Item(&monsterTexture, sf::Vector2u(4, 48), 0.5f, monsterAnims, sf::Vector2f(16.0f, 16.0f), sf::Vector2f(200.0f, 348.0f)));
 	items.push_back(Item(&monsterTexture, sf::Vector2u(4, 48), 0.5f, monsterAnims, sf::Vector2f(16.0f, 16.0f), sf::Vector2f(360.0f, 332.0f)));
 	items.push_back(Item(&monsterTexture, sf::Vector2u(4, 48), 0.5f, monsterAnims, sf::Vector2f(16.0f, 16.0f), sf::Vector2f(120.0f, -10.0f)));
 
-	//nasz cel ko�cowy, statek do ucieczki
+	//nasz cel koncowy, statek do ucieczki
 	Platform plane(&planeTexture, sf::Vector2f(72.0f, 36.0f), sf::Vector2f(50.0f, -20.0f));
 
-	float deltaTime = 0.0f; //czas pomi�dzy p�tlami
+	float deltaTime = 0.0f; //czas pomiedzy petlami
 
 	sf::Clock clock;
-	window.setFramerateLimit(120); //maksymalna ilo�� klatek na sekund�
+	window.setFramerateLimit(120); //maksymalna ilosc klatek na sekunde
 
 	
-	// run the program as long as the window is open
 	while (window.isOpen()) {
 		sf::Event event;
-		// check all the window's events that were triggered since the last iteration of the loop
 		while (window.pollEvent(event)) {
-			// "close requested" event: we close the window
-			
 			switch (event.type)
 			{
 			case sf::Event::Closed:
@@ -197,7 +193,7 @@ int main() {
 							menu_is_open = !menu_is_open;
 							menu.closeMenu();
 							break;
-						case 1:								//restartuje gr�, poprzez reset punkt�w, pozycji gracza, vektora item�w oraz zmienienie boola zako�czenia gry
+						case 1:								//restartuje gre, poprzez reset punktow, pozycji gracza, vektora itemow oraz zmienienie boola zakoeczenia gry
 							points = 0;
 							text.setString("Points : " + std::to_string(points));
 							items.clear();
@@ -210,7 +206,7 @@ int main() {
 							end = false;
 							menu_is_open = false;
 							break;
-						case 2:								//zamyka gr�
+						case 2:								//zamyka gre
 							std::cout << "Exit\n";
 							window.close();
 						default:
@@ -220,7 +216,7 @@ int main() {
 						break;
 					}
 				}
-				switch (event.key.code)						//escape �eby otworzy�/zamkn�� menu
+				switch (event.key.code)						//escape zeby otworzyc/zamknac menu
 				{
 				case sf::Keyboard::Escape:
 					menu_is_open = !menu_is_open;
@@ -233,9 +229,9 @@ int main() {
 			}
 		}
 
-		deltaTime = clock.restart().asSeconds();			//ile min�o od ostatniej p�tli
+		deltaTime = clock.restart().asSeconds();			//ile minelo od ostatniej petli
 
-		//update all positions
+		//update pozycji
 		hero.Update(deltaTime, event, text);
 		
 		for (Item & item : items) {
@@ -244,7 +240,7 @@ int main() {
 
 
 
-		//check collisions
+		//sprawdzenie kolizji
 
 		Collider pCollision = hero.GetCollider();
 		sf::Vector2f direction;
@@ -259,7 +255,7 @@ int main() {
 		}
 
 
-		for (unsigned int i = 0; i < items.size(); ++i) { //end of game - plane
+		for (unsigned int i = 0; i < items.size(); ++i) { //koniec gry - samolot
 			if (items[i].Getcollider().CheckCollison(pCollision, direction, 0.0f)) {
 				hero.OnCollision(direction);
 				items.erase(items.begin() + i);
@@ -269,12 +265,12 @@ int main() {
 			}
 		}
 
-		if (end) {//end scene
+		if (end) {//scena koncowa
 			view.setCenter(1000, 1000);
 			menu.setPosition(sf::Vector2f(1000, 1000), 300);
 		}
 		else {
-			//set view on hero
+			//ustawianie widoku na gracza
 			view.setCenter(hero.getPosition());
 			menu.setPosition(hero.getPosition(), 300);
 		}
@@ -283,11 +279,11 @@ int main() {
 
 
 
-		// clear the window with black color
+		// czyscimy okno
 		window.clear(sf::Color(80, 40, 120));
 		window.setView(view);
 
-		// draw everything here...
+		// ryseujemy wszystko
 		for (Platform p : platforms) {
 			p.Draw(window);
 		}
@@ -302,13 +298,12 @@ int main() {
 		window.draw(text);
 		window.draw(congrats);
 
-		//menu draw
+		//rysowanie menu
 		if (menu_is_open) {
 			window.clear(sf::Color(100, 60, 100));
 			menu.draw(window);
 		}
 
-		// end the current frame
 		window.display();
 	}
 
