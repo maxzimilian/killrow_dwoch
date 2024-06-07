@@ -11,12 +11,15 @@ public:
     void Update(float deltaTime);
 
     void IncreaseLevel(float amount);
+    void ResetPosition();
 
     sf::FloatRect getBounds() { return body.getGlobalBounds(); }
 
 private:
-    sf::RectangleShape body;
-    float speed;
+    sf::RectangleShape body; // Prostokąt reprezentujący lawę
+    float speed; // Szybkość podnoszenia się lawy
+    sf::Vector2f startPos; // Początkowa pozycja lawy
+    sf::Vector2f initialSize; // Początkowy rozmiar lawy
 };
 
 #endif // LAVA_H
