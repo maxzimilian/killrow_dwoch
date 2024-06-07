@@ -29,7 +29,3 @@
 # Executables
 *.out
 *.app
-
-#Kompilacja
-*.sh
-.vscode/
