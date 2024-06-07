@@ -33,3 +33,6 @@
 #Kompilacja
 *.sh
 .vscode/
+MakeFile
+run.bat
+src/
