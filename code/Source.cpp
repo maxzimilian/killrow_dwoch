@@ -40,18 +40,7 @@ int main() {
     if (!font.loadFromFile("Pixel.ttf")) { // [utopiafonts] 1999 free font, 1999 utopiafonts. dale_thorpe@bssc.edu.au, https://www.1001fonts.com/pixel-font.html
         return 1;
     }
-
-    // tekst wysiwetlany po podniesnieiu power up
-    sf::Text powerUpMessage;
-    float powerUpMessageTimer = 0.0f;
-    powerUpMessage.setFont(font);
-    powerUpMessage.setString("Power-Up Collected!\nJump Height Increased!");
-    powerUpMessage.setCharacterSize(64);
-    powerUpMessage.setScale(0.3, 0.3);
-    powerUpMessage.setFillColor(sf::Color::Green); // Set a different color
-    powerUpMessage.setOutlineColor(sf::Color::Black);
-    powerUpMessage.setOutlineThickness(3);
-        
+    
     // tekst z iloscia punktow gracza, ktory bedzie podawany w lewym gornym rogu
     sf::Text text;
     text.setFont(font);
@@ -95,6 +84,17 @@ int main() {
     lavaWarning.setFillColor(sf::Color::Red);
     lavaWarning.setOutlineColor(sf::Color::Black);
     lavaWarning.setOutlineThickness(3);
+
+    // power-up message
+    sf::Text powerUpMessage;
+    float powerUpMessageTimer = 0.0f;
+    powerUpMessage.setFont(font);
+    powerUpMessage.setString("Power-Up Collected!");
+    powerUpMessage.setCharacterSize(64);
+    powerUpMessage.setScale(0.3, 0.3);
+    powerUpMessage.setFillColor(sf::Color::Green); // Set a different color
+    powerUpMessage.setOutlineColor(sf::Color::Black);
+    powerUpMessage.setOutlineThickness(3);
 
     // tekstury do wykorzystania dla gracza, platform oraz "itemow" do zbierania
     sf::Texture texture, planeTexture, tileTexture, sTileTexture, rockTexture, monsterTexture, lavaTexture;
@@ -251,11 +251,14 @@ int main() {
 
         deltaTime = clock.restart().asSeconds(); // ile minelo od ostatniej petli
 
+        // Update the power-up message timer
+        if (powerUpMessageTimer > 0.0f) {
+            powerUpMessageTimer -= deltaTime;
+        }
+
         // update pozycji
         sf::Vector2f currentPosition = hero.getPosition();
-        if (powerUpMessageTimer > 0.0f) {
-            powerUpMessageTimer -= deltaTime;       
-        }
+
         if (currentPosition == previousPosition) {
             idleTime += deltaTime;
             if (idleTime >= 2.0f && idleTime < 3.0f) {
@@ -295,11 +298,6 @@ int main() {
         if (plane.Getcollider().CheckCollison(pCollision, direction, 1.0f)) {
             end = true;
         }
-        if (powerUp.GetCollider().CheckCollison(pCollision, direction, 0.0f)) {
-        hero.ApplyPowerUp();
-        powerUp.collect(); // zebrano power up
-        powerUpMessageTimer = 2.0f; // wyswietl komunikat przez 2 sekundy
-        }
 
         for (unsigned int i = 0; i < items.size(); ++i) {
             if (items[i].Getcollider().CheckCollison(pCollision, direction, 0.0f)) {
@@ -312,9 +310,10 @@ int main() {
             }
         }
 
-        if (powerUp.GetCollider().CheckCollison(pCollision, direction, 0.0f)) {
+        if (powerUp.isActive() && powerUp.GetCollider().CheckCollison(pCollision, direction, 0.0f)) {
             hero.ApplyPowerUp();
-            powerUp.collect(); // Ustawienie flagi zebrane
+            powerUp.collect(); // Mark as collected
+            powerUpMessageTimer = 2.0f; // Show message for 2 seconds
         }
 
         if (hero.CheckCollisionWithLava(lava.getBounds())) {
@@ -327,13 +326,6 @@ int main() {
             menu.setPosition(sf::Vector2f(1000, 1000), 300);
         } else {
             // ustawianie widoku na gracza
-            view.setCenter(hero.getPosition());
-            menu.setPosition(hero.getPosition(), 300);
-        }
-        if (end) {
-            view.setCenter(1000, 1000);
-            menu.setPosition(sf::Vector2f(1000, 1000), 300);
-        } else {
             view.setCenter(hero.getPosition());
             menu.setPosition(hero.getPosition(), 300);
         }

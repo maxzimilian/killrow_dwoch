@@ -12,7 +12,7 @@ public:
     void OnCollision(sf::Vector2f direction);
     void restart();
 
-    bool CheckCollisionWithLava(const sf::FloatRect& lavaBounds); // Add this line
+    bool CheckCollisionWithLava(const sf::FloatRect& lavaBounds);
     sf::Vector2f getPosition();
     Collider GetCollider() { return Collider(body); }
 

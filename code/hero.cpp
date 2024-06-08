@@ -1,7 +1,7 @@
 #include "hero.h"
 
 Hero::Hero(sf::Texture* texture, sf::Vector2u imageCount, float switchTime, std::vector<std::vector<int>> allAnims, float speed, float jumpHeight)
-    : animation(texture, imageCount, switchTime, allAnims) {
+    : animation(texture, imageCount, switchTime, allAnims), startPos(sf::Vector2f(100.0f, -10.0f)) {
     this->speed = speed;
     this->anim = 0;
     this->jumpHeight = jumpHeight;
@@ -9,6 +9,7 @@ Hero::Hero(sf::Texture* texture, sf::Vector2u imageCount, float switchTime, std:
     canJump = false;
     jump = 0;
     isPoweredUp = false; // Inicjalizacja stanu power-up
+    powerUpTimer = 0.0f;
 
     body.setSize(sf::Vector2f(13.0f, 20.f));
     body.setPosition(startPos);
@@ -19,13 +20,14 @@ Hero::Hero(sf::Texture* texture, sf::Vector2u imageCount, float switchTime, std:
 void Hero::restart() {
     body.setPosition(startPos);
     isPoweredUp = false; // Resetowanie stanu power-up
+    powerUpTimer = 0.0f; // Resetowanie timera power-up
     jumpHeight = 60.0f; // Resetowanie wysokości skoku do wartości początkowej
 }
 
 void Hero::ApplyPowerUp() {
     isPoweredUp = true;
     powerUpTimer = 10.0f; // Czas trwania power-up
-    jumpHeight *= 1.02f; // Zmodyfikuj tę wartość, aby zmienić siłę power-up (np. 1.5 dla 50% wzrostu, 2.0 dla 100% wzrostu)
+    jumpHeight *= 1.5f; // Wzrost wysokości skoku
 }
 
 void Hero::UpdatePowerUp(float deltaTime) {
@@ -33,7 +35,7 @@ void Hero::UpdatePowerUp(float deltaTime) {
         powerUpTimer -= deltaTime;
         if (powerUpTimer <= 0) {
             isPoweredUp = false;
-            jumpHeight /= 2.0f; // Resetowanie wysokości skoku po wygaśnięciu power-up
+            jumpHeight /= 1.5f; // Resetowanie wysokości skoku po wygaśnięciu power-up
         }
     }
 }

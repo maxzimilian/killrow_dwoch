@@ -9,7 +9,7 @@ public:
     void Draw(sf::RenderWindow& window);
     Collider GetCollider() { return Collider(body); }
     void Update(float deltaTime);
-    bool isActive() const { return active; }
+    bool isActive() const { return active && !collected;}
     void collect() { collected = true; } // ustawienie czy zebrane na prawda
 
 private:
