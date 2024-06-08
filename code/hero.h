@@ -12,12 +12,15 @@ public:
     void OnCollision(sf::Vector2f direction);
     void restart();
 
-    bool CheckCollisionWithLava(const sf::FloatRect& lavaBounds);
+    bool CheckCollisionWithLava(const sf::FloatRect& lavaBounds); // Sprawdzenie kolizji z lawą
     sf::Vector2f getPosition();
     Collider GetCollider() { return Collider(body); }
 
-    void ApplyPowerUp();
-    void UpdatePowerUp(float deltaTime);
+    void ApplyPowerUp(); // Zastosowanie power-upu
+    void UpdatePowerUp(float deltaTime); // Aktualizacja stanu power-upu
+
+    bool isPoweredUp() const { return poweredUp; } // Sprawdzenie, czy power-up jest aktywny
+    float getPowerUpTimeLeft() const { return powerUpTimer; } // Pobranie pozostałego czasu power-upu
 
 private:
     sf::RectangleShape body;
@@ -25,17 +28,11 @@ private:
     unsigned int anim;
     float speed;
     bool faceLeft;
-    bool isPoweredUp;
+    bool poweredUp;
     float powerUpTimer;
 
-    //początek
-    //sf::Vector2f startPos = sf::Vector2f(180.0f, 650.0f);
-    //przez statkiem - stara mapa
-    sf::Vector2f startPos = sf::Vector2f(100.0f, -10.0f);
-
-
-    
-
+    sf::Vector2f startPos; // początek
+    // sf::Vector2f startPos = sf::Vector2f(180.0f, 650.0f); // przez statkiem - stara mapa
     sf::Vector2f velocity;
     bool canJump;
     float jumpHeight;

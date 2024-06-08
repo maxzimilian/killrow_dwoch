@@ -51,6 +51,16 @@ int main() {
     text.setOutlineColor(sf::Color(73, 5, 55));
     text.setOutlineThickness(3);
 
+    // tekst z czasem trwania power-upu
+    sf::Text powerUpTimerText;
+    powerUpTimerText.setFont(font);
+    powerUpTimerText.setString("Power-Up Time: 0");
+    powerUpTimerText.setCharacterSize(64);
+    powerUpTimerText.setScale(0.2, 0.2);
+    powerUpTimerText.setFillColor(sf::Color(255, 255, 0));
+    powerUpTimerText.setOutlineColor(sf::Color(73, 5, 55));
+    powerUpTimerText.setOutlineThickness(3);
+
     // napis koncowy gry
     sf::Text congrats;
     congrats.setFont(font);
@@ -285,6 +295,14 @@ int main() {
 
         lava.Update(deltaTime);
 
+        // Update the power-up timer text
+        if (hero.isPoweredUp()) {
+            powerUpTimerText.setString("Power-Up Time: " + std::to_string(static_cast<int>(hero.getPowerUpTimeLeft())));
+            powerUpTimerText.setPosition(text.getPosition().x, text.getPosition().y + 20);
+        } else {
+            powerUpTimerText.setString("");
+        }
+
         // sprawdzenie kolizji
         Collider pCollision = hero.GetCollider();
         sf::Vector2f direction;
@@ -349,6 +367,7 @@ int main() {
         powerUp.Draw(window);
 
         window.draw(text);
+        window.draw(powerUpTimerText); // Draw the power-up timer text
         if (died) {
             window.draw(deathMessage);
         } else {
