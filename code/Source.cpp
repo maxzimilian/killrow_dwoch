@@ -99,8 +99,8 @@ int main() {
     std::vector<Platform> platforms;
 	//tiles
     platforms.push_back(Platform(&tileTexture, sf::Vector2f(512.0f, 160.0f), sf::Vector2f(256.0f, 800.0f))); // dolna ściana
-    platforms.push_back(Platform(&tileTexture, sf::Vector2f(288.0f, 2000.0f), sf::Vector2f(0.0f, 500.0f))); //lewa 144 800  72 400 - stara
-    platforms.push_back(Platform(&tileTexture, sf::Vector2f(288.0f, 2000.0f), sf::Vector2f(512.0f, 400.0f))); //prawa
+    platforms.push_back(Platform(&tileTexture, sf::Vector2f(288.0f, 1000.0f), sf::Vector2f(0.0f, 500.0f))); //lewa 144 800  72 400 - stara
+    platforms.push_back(Platform(&tileTexture, sf::Vector2f(288.0f, 1000.0f), sf::Vector2f(512.0f, 400.0f))); //prawa
     platforms.push_back(Platform(&tileTexture, sf::Vector2f(32.0f, 128.0f), sf::Vector2f(160.0f, 704.0f)));
     platforms.push_back(Platform(&tileTexture, sf::Vector2f(32.0f, 32.0f), sf::Vector2f(208.0f, 656.0f)));
     platforms.push_back(Platform(&tileTexture, sf::Vector2f(32.0f, 32.0f), sf::Vector2f(288.0f, 704.0f)));
@@ -118,7 +118,7 @@ int main() {
     platforms.push_back(Platform(&tileTexture, sf::Vector2f(32.0f, 16.0f), sf::Vector2f(272.0f, 264.0f)));
     platforms.push_back(Platform(&tileTexture, sf::Vector2f(16.0f, 16.0f), sf::Vector2f(200.0f, 370.0f)));
     platforms.push_back(Platform(&tileTexture, sf::Vector2f(16.0f, 16.0f), sf::Vector2f(152.0f, 264.0f)));
-    platforms.push_back(Platform(&tileTexture, sf::Vector2f(160.0f, 32.0f), sf::Vector2f(256.0f, 32.0f)));
+    platforms.push_back(Platform(&tileTexture, sf::Vector2f(160.0f, 32.0f), sf::Vector2f(256.0f, 32.0f))); //najwyzsza platforma przy statku - stara
     platforms.push_back(Platform(&tileTexture, sf::Vector2f(128.0f, 128.0f), sf::Vector2f(448.0f, -64.0f)));
 
 	//small Tiles
