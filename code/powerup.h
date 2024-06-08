@@ -1,7 +1,6 @@
-
+#pragma once
 #include "collider.h"
 #include "animation.h"
-#pragma once
 
 class PowerUp {
 public:
@@ -10,10 +9,13 @@ public:
     void Draw(sf::RenderWindow& window);
     Collider GetCollider() { return Collider(body); }
     void Update(float deltaTime);
+    bool isActive() const { return active; }
+    void collect() { collected = true; } // ustawienie czy zebrane na prawda
 
 private:
     sf::RectangleShape body;
     Animation animation;
     unsigned int anim;
+    bool active;
+    bool collected; // czy zebrane
 };
-

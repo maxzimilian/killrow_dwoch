@@ -13,7 +13,7 @@ void resizeView(sf::RenderWindow& window, sf::View& view) { // funkcja do skalow
 }
 
 // funkcja do resetowania gry
-void resetGame(Hero& hero, std::vector<Item>& items, Lava& lava, std::vector<Platform>& platforms, sf::Texture& monsterTexture, const std::vector<std::vector<int>>& monsterAnims, int& points, sf::Text& text) {
+void resetGame(Hero& hero, std::vector<Item>& items, Lava& lava, std::vector<Platform>& platforms, sf::Texture& monsterTexture, const std::vector<std::vector<int>>& monsterAnims, int& points, sf::Text& text, PowerUp& powerUp) {
     points = 0;
     text.setString("Points : " + std::to_string(points));
     items.clear();
@@ -23,16 +23,14 @@ void resetGame(Hero& hero, std::vector<Item>& items, Lava& lava, std::vector<Pla
     items.push_back(Item(&monsterTexture, sf::Vector2u(4, 48), 0.5f, monsterAnims, sf::Vector2f(16.0f, 16.0f), sf::Vector2f(120.0f, -10.0f)));
     hero.restart();
     lava.ResetPosition();
-    PowerUp powerUp(&monsterTexture, sf::Vector2u(4, 48), 0.5f, monsterAnims, sf::Vector2f(16.0f, 16.0f), sf::Vector2f(240.0f, 200.0f));  // Reset power-up position
+    powerUp = PowerUp(&monsterTexture, sf::Vector2u(4, 48), 0.5f, monsterAnims, sf::Vector2f(16.0f, 16.0f), sf::Vector2f(240.0f, 200.0f)); // Resetowanie power-up
 }
 
-// jezeli gra jest za trudna, to polecamy zmienic pozycje poczatkowa gracza w jego klasie, zeby ominac trudnosci
 int main() {
     sf::RenderWindow window(sf::VideoMode(VIEW_HEIGHT, VIEW_HEIGHT), "Jumping timber");
     sf::View view(sf::Vector2f(0.0f, 0.0f), sf::Vector2f(VIEW_HEIGHT, VIEW_HEIGHT));
 
     Menu menu(VIEW_HEIGHT, VIEW_HEIGHT); // menu gry
-
     bool menu_is_open = true; // czy gra ma otwarte okno menu
     bool end = false; // czy gra juz sie skonczyla
     bool died = false; // czy gracz umarl
@@ -213,13 +211,13 @@ int main() {
                             menu_is_open = !menu_is_open;
                             menu.closeMenu();
                             if (died || end) {
-                                resetGame(hero, items, lava, platforms, monsterTexture, monsterAnims, points, text);
+                                resetGame(hero, items, lava, platforms, monsterTexture, monsterAnims, points, text, powerUp);
                                 end = false;
                                 died = false;
                             }
                             break;
                         case 1: // restartuje gre, poprzez reset punktow, pozycji gracza, wektora itemow oraz zmienienie boola zakonczenia gry
-                            resetGame(hero, items, lava, platforms, monsterTexture, monsterAnims, points, text);
+                            resetGame(hero, items, lava, platforms, monsterTexture, monsterAnims, points, text, powerUp);
                             menu.closeMenu();
                             end = false;
                             died = false;
@@ -267,7 +265,7 @@ int main() {
             item.Update(deltaTime);
         }
 
-          powerUp.Update(deltaTime);  
+        powerUp.Update(deltaTime);  
 
         lava.Update(deltaTime);
 
@@ -298,7 +296,9 @@ int main() {
 
         if (powerUp.GetCollider().CheckCollison(pCollision, direction, 0.0f)) {
             hero.ApplyPowerUp();
+            powerUp.collect(); // Ustawienie flagi zebrane
         }
+
         if (hero.CheckCollisionWithLava(lava.getBounds())) {
             end = true;
             died = true;
