@@ -25,7 +25,7 @@ void Hero::restart() {
 void Hero::ApplyPowerUp() {
     isPoweredUp = true;
     powerUpTimer = 10.0f; // Czas trwania power-up
-    jumpHeight *= 2.0f; // Zmodyfikuj tę wartość, aby zmienić siłę power-up (np. 1.5 dla 50% wzrostu, 2.0 dla 100% wzrostu)
+    jumpHeight *= 1.02f; // Zmodyfikuj tę wartość, aby zmienić siłę power-up (np. 1.5 dla 50% wzrostu, 2.0 dla 100% wzrostu)
 }
 
 void Hero::UpdatePowerUp(float deltaTime) {
