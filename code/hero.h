@@ -18,12 +18,17 @@ public:
     sf::Vector2f getPosition();
     Collider GetCollider() { return Collider(body); }
 
+    void ApplyPowerUp();
+    void UpdatePowerUp(float deltaTime);
+
 private:
     sf::RectangleShape body;
     Animation animation;
     unsigned int anim;
     float speed;
     bool faceLeft;
+    bool isPoweredUp;
+    float powerUpTimer;
 
     //początek
     //sf::Vector2f startPos = sf::Vector2f(180.0f, 650.0f);

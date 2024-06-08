@@ -21,6 +21,22 @@ void Hero::restart() {
     body.setPosition(startPos);
 }
 
+void Hero::ApplyPowerUp() {
+    isPoweredUp = true;
+    powerUpTimer = 10.0f;
+    jumpHeight *= 1.5f; // Increase jump height by 50%
+}
+
+void Hero::UpdatePowerUp(float deltaTime) {
+    if (isPoweredUp) {
+        powerUpTimer -= deltaTime;
+        if (powerUpTimer <= 0) {
+            isPoweredUp = false;
+            jumpHeight /= 1.5f; // Reset jump height
+        }
+    }
+}
+
 void Hero::Update(float deltaTime, sf::Event event, sf::Text& text) {
     if (canJump) {
         velocity.x = 0;
@@ -70,6 +86,7 @@ void Hero::Update(float deltaTime, sf::Event event, sf::Text& text) {
     body.move(velocity * deltaTime);
     canJump = false;
     text.setPosition(sf::Vector2f(body.getPosition().x - 148.0f, body.getPosition().y - 150.0f));
+	UpdatePowerUp(deltaTime);
 }
 
 void Hero::Draw(sf::RenderWindow& window) {

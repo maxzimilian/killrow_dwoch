@@ -1,4 +1,5 @@
 #include "hero.h"
+#include "powerup.h"
 #include "platform.h"
 #include "item.h"
 #include "Menu.h"
@@ -22,6 +23,7 @@ void resetGame(Hero& hero, std::vector<Item>& items, Lava& lava, std::vector<Pla
     items.push_back(Item(&monsterTexture, sf::Vector2u(4, 48), 0.5f, monsterAnims, sf::Vector2f(16.0f, 16.0f), sf::Vector2f(120.0f, -10.0f)));
     hero.restart();
     lava.ResetPosition();
+    PowerUp powerUp(&monsterTexture, sf::Vector2u(4, 48), 0.5f, monsterAnims, sf::Vector2f(16.0f, 16.0f), sf::Vector2f(240.0f, 200.0f));  // Reset power-up position
 }
 
 // jezeli gra jest za trudna, to polecamy zmienic pozycje poczatkowa gracza w jego klasie, zeby ominac trudnosci
@@ -174,6 +176,9 @@ int main() {
     // lawa, ktora bedzie sie podnosic
     Lava lava(&lavaTexture, sf::Vector2f(600.0f, 800.0f), sf::Vector2f(180.0f, 800.0f)); // Initial height 0, expands upwards
 
+    //power up skoku
+    PowerUp powerUp(&monsterTexture, sf::Vector2u(4, 48), 0.5f, monsterAnims, sf::Vector2f(16.0f, 16.0f), sf::Vector2f(240.0f, 200.0f));  
+
     float deltaTime = 0.0f; // czas pomiedzy petlami
 
     sf::Clock clock;
@@ -231,6 +236,7 @@ int main() {
                     menu.closeMenu();
                 }
                 break;
+                
             }
         }
 
@@ -261,6 +267,8 @@ int main() {
             item.Update(deltaTime);
         }
 
+          powerUp.Update(deltaTime);  
+
         lava.Update(deltaTime);
 
         // sprawdzenie kolizji
@@ -288,6 +296,9 @@ int main() {
             }
         }
 
+        if (powerUp.GetCollider().CheckCollison(pCollision, direction, 0.0f)) {
+            hero.ApplyPowerUp();
+        }
         if (hero.CheckCollisionWithLava(lava.getBounds())) {
             end = true;
             died = true;
@@ -318,6 +329,7 @@ int main() {
         plane.Draw(window);
         hero.Draw(window);
         lava.Draw(window);
+        powerUp.Draw(window);
 
         window.draw(text);
         if (died) {
