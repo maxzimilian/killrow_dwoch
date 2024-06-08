@@ -25,7 +25,13 @@ private:
     float speed;
     bool faceLeft;
 
-    sf::Vector2f startPos = sf::Vector2f(180.0f, 650.0f);
+    //początek
+    //sf::Vector2f startPos = sf::Vector2f(180.0f, 650.0f);
+    //przez statkiem - stara mapa
+    sf::Vector2f startPos = sf::Vector2f(100.0f, -510.0f);
+
+
+    
 
     sf::Vector2f velocity;
     bool canJump;
