@@ -26,7 +26,7 @@ void Hero::restart() {
 
 void Hero::ApplyPowerUp() {
     poweredUp = true;
-    powerUpTimer = 10.0f; // Czas trwania power-up
+    powerUpTimer = 20.0f; // Czas trwania power-up
     jumpHeight *= 1.5f; // Wzrost wysokości skoku
 }
 

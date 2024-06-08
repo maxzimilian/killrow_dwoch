@@ -61,6 +61,16 @@ int main() {
     powerUpTimerText.setOutlineColor(sf::Color(73, 5, 55));
     powerUpTimerText.setOutlineThickness(3);
 
+    // globalny timer gry
+    sf::Text gameTimerText;
+    gameTimerText.setFont(font);
+    gameTimerText.setString("Time: 0");
+    gameTimerText.setCharacterSize(64);
+    gameTimerText.setScale(0.2, 0.2);
+    gameTimerText.setFillColor(sf::Color::White);
+    gameTimerText.setOutlineColor(sf::Color::Black);
+    gameTimerText.setOutlineThickness(3);
+
     // napis koncowy gry
     sf::Text congrats;
     congrats.setFont(font);
@@ -201,6 +211,7 @@ int main() {
     float deltaTime = 0.0f; // czas pomiedzy petlami
 
     sf::Clock clock;
+    sf::Clock gameClock; // global timer clock
     window.setFramerateLimit(120); // maksymalna ilosc klatek na sekunde
 
     float idleTime = 0.0f;
@@ -233,12 +244,14 @@ int main() {
                             menu.closeMenu();
                             if (died || end) {
                                 resetGame(hero, items, lava, platforms, monsterTexture, monsterAnims, points, text, powerUp);
+                                gameClock.restart(); // Restart global timer
                                 end = false;
                                 died = false;
                             }
                             break;
                         case 1: // restartuje gre, poprzez reset punktow, pozycji gracza, wektora itemow oraz zmienienie boola zakonczenia gry
                             resetGame(hero, items, lava, platforms, monsterTexture, monsterAnims, points, text, powerUp);
+                            gameClock.restart(); // Restart global timer
                             menu.closeMenu();
                             end = false;
                             died = false;
@@ -265,6 +278,10 @@ int main() {
         if (powerUpMessageTimer > 0.0f) {
             powerUpMessageTimer -= deltaTime;
         }
+
+        // Update global game timer
+        sf::Time gameTime = gameClock.getElapsedTime();
+        gameTimerText.setString("Time: " + std::to_string(static_cast<int>(gameTime.asSeconds())));
 
         // update pozycji
         sf::Vector2f currentPosition = hero.getPosition();
@@ -346,6 +363,9 @@ int main() {
             // ustawianie widoku na gracza
             view.setCenter(hero.getPosition());
             menu.setPosition(hero.getPosition(), 300);
+
+            // Update the position of the global game timer text
+            gameTimerText.setPosition(view.getCenter().x - gameTimerText.getGlobalBounds().width / 2, view.getCenter().y - view.getSize().y / 2 + 10);
         }
 
         // czyscimy okno
@@ -368,6 +388,7 @@ int main() {
 
         window.draw(text);
         window.draw(powerUpTimerText); // Draw the power-up timer text
+        window.draw(gameTimerText); // Draw the global game timer
         if (died) {
             window.draw(deathMessage);
         } else {
