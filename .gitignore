@@ -29,10 +29,3 @@
 # Executables
 *.out
 *.app
-
-#Kompilacja
-*.sh
-.vscode/
-MakeFile
-run.bat
-src/
