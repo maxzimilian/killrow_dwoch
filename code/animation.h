@@ -26,7 +26,7 @@ private:
 
 	float totalTime; //ile minelo od ostatniej zmiany klatki
 	float switchTime; //ile ma minac pomiedzy klatkami
-	unsigned int usedAnim; //uzywana klatka
+	unsigned int usedAnim; //uzywana klatkad
 };
 
 #endif // ANIMATION_H
