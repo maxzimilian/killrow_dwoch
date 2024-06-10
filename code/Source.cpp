@@ -4,12 +4,12 @@
 #include "item.h"
 #include "Menu.h"
 #include "lava.h"
-#include "leaderboard.h" // Include leaderboard header
+#include "leaderboard.h" 
 
 enum GameState {
     MENU,
     PLAYING,
-    LEADERBOARD
+    LEADERBOARD,
 };
 
 static const float VIEW_HEIGHT = 300.0f;
@@ -79,6 +79,7 @@ int main() {
     gameTimerText.setFillColor(sf::Color::White);
     gameTimerText.setOutlineColor(sf::Color::Black);
     gameTimerText.setOutlineThickness(3);
+    
 
     // napis koncowy gry
     sf::Text congrats;
