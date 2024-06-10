@@ -279,7 +279,7 @@ int main() {
                 died = false;
                 break;
             case 2: // wyświetla tablicę wyników
-                leaderboard.loadFromFile("leaderboard.txt"); // Load leaderboard data
+                leaderboard.loadFromFile("code/leaderboard.txt"); // Load leaderboard data
                 leaderboard.draw(window, font);
                 gameState = LEADERBOARD;
                 break;
@@ -455,7 +455,7 @@ int main() {
         } else if (gameState == LEADERBOARD) {
             // czyscimy okno
             window.clear(sf::Color(100, 60, 100));
-            leaderboard.loadFromFile("leaderboard.txt"); // Ensure leaderboard is loaded before drawing
+            leaderboard.loadFromFile("code/leaderboard.txt"); // Ensure leaderboard is loaded before drawing
             leaderboard.draw(window, font);
         }
 
@@ -466,7 +466,7 @@ int main() {
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
                 std::cout << "Saving score to leaderboard." << std::endl; // Debug statement
                 leaderboard.addEntry(points, gameClock.getElapsedTime().asSeconds());
-                leaderboard.saveToFile("leaderboard.txt"); // Ensure the leaderboard is saved
+                leaderboard.saveToFile("code/leaderboard.txt"); // Ensure the leaderboard is saved
                 resetGame(hero, items, lava, platforms, monsterTexture, monsterAnims, points, text, powerUp);
                 gameState = MENU;
                 
