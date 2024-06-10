@@ -6,6 +6,11 @@
 #include "lava.h"
 #include "leaderboard.h" 
 
+    sf::Clock Clock;
+    sf::Clock gameClock;
+    sf::Time totalTime;
+    sf::Time pauseTime; // global timer clock
+
 enum GameState {
     MENU,
     PLAYING,
@@ -29,6 +34,7 @@ void resetGame(Hero& hero, std::vector<Item>& items, Lava& lava, std::vector<Pla
     items.push_back(Item(&monsterTexture, sf::Vector2u(4, 48), 0.5f, monsterAnims, sf::Vector2f(16.0f, 16.0f), sf::Vector2f(120.0f, -10.0f)));
     hero.restart();
     lava.ResetPosition();
+   
     powerUp = PowerUp(&monsterTexture, sf::Vector2u(4, 48), 0.5f, monsterAnims, sf::Vector2f(16.0f, 16.0f), sf::Vector2f(240.0f, 200.0f)); // Resetowanie power-up
 }
 
@@ -220,8 +226,9 @@ int main() {
 
     float deltaTime = 0.0f; // czas pomiedzy petlami
 
-    sf::Clock clock;
-    sf::Clock gameClock; // global timer clock
+  
+
+    
     window.setFramerateLimit(120); // maksymalna ilosc klatek na sekunde
 
     float idleTime = 0.0f;
@@ -239,65 +246,70 @@ int main() {
                 resizeView(window, view);
                 break;
             case sf::Event::KeyReleased:
-                switch (gameState) {
-                case MENU: // opcje menu
-                    switch (event.key.code) {
-                    case sf::Keyboard::W:
-                        menu.moveUp();
-                        break;
-                    case sf::Keyboard::S:
-                        menu.moveDown();
-                        break;
-                    case sf::Keyboard::Return: // enter
-                        switch (menu.GetPressedItem()) { // po wybraniu opcji z menu
-                        case 0: // wraca do gry
-                            gameState = PLAYING;
-                            menu.closeMenu();
-                            if (died || end) {
-                                resetGame(hero, items, lava, platforms, monsterTexture, monsterAnims, points, text, powerUp);
-                                gameClock.restart(); // Restart global timer
-                                end = false;
-                                died = false;
-                            }
-                            break;
-                        case 1: // restartuje gre, poprzez reset punktow, pozycji gracza, wektora itemow oraz zmienienie boola zakonczenia gry
-                            resetGame(hero, items, lava, platforms, monsterTexture, monsterAnims, points, text, powerUp);
-                            gameClock.restart(); // Restart global timer
-                            gameState = PLAYING;
-                            end = false;
-                            died = false;
-                            break;
-                        case 2: // wyświetla tablicę wyników
-                            leaderboard.loadFromFile("leaderboard.txt");
-                            leaderboard.draw(window, font);
-                            gameState = LEADERBOARD;
-                            break;
-                        case 3: // zamyka gre
-                            window.close();
-                            break;
-                        }
-                        break;
-                    case sf::Keyboard::Escape: // escape zeby otworzyc/zamknac menu
-                        window.close();
-                        break;
-                    }
-                    break;
-                case PLAYING: // gra
-                    if (event.key.code == sf::Keyboard::Escape) {
-                        gameState = MENU;
-                    }
-                    break;
-                case LEADERBOARD: // tablica wyników
-                    if (event.key.code == sf::Keyboard::Escape) {
-                        gameState = MENU;
-                    }
-                    break;
+    switch (gameState) {
+    case MENU: // opcje menu
+        switch (event.key.code) {
+        case sf::Keyboard::W:
+            menu.moveUp();
+            break;
+        case sf::Keyboard::S:
+            menu.moveDown();
+            break;
+        case sf::Keyboard::Return: // enter
+            switch (menu.GetPressedItem()) { // po wybraniu opcji z menu
+            case 0: // wraca do gry
+                gameState = PLAYING;
+                menu.closeMenu();
+                if (died || end) {
+                    resetGame(hero, items, lava, platforms, monsterTexture, monsterAnims, points, text, powerUp);
+                    totalTime = sf::Time::Zero; // Reset total time
+                    gameClock.restart(); // Restart global timer
+                    end = false;
+                    died = false;
+                } else {
+                    gameClock.restart(); // Restart clock for resuming the game
                 }
                 break;
+            case 1: // restartuje gre
+                resetGame(hero, items, lava, platforms, monsterTexture, monsterAnims, points, text, powerUp);
+                totalTime = sf::Time::Zero; // Reset total time
+                gameClock.restart(); // Restart global timer
+                gameState = PLAYING;
+                end = false;
+                died = false;
+                break;
+            case 2: // wyświetla tablicę wyników
+                leaderboard.loadFromFile("leaderboard.txt"); // Load leaderboard data
+                gameState = LEADERBOARD;
+                break;
+            case 3: // zamyka gre
+                window.close();
+                break;
+            }
+            break;
+        case sf::Keyboard::Escape:
+            window.close();
+            break;
+        }
+        break;
+    case PLAYING: // gra
+        if (event.key.code == sf::Keyboard::Escape) {
+            gameState = MENU;
+            pauseTime = gameClock.getElapsedTime(); // Store the elapsed time at pause
+            totalTime += pauseTime; // Update total elapsed time
+        }
+        break;
+    case LEADERBOARD: // tablica wyników
+        if (event.key.code == sf::Keyboard::Escape) {
+            gameState = MENU;
+        }
+        break;
+    }
+    break;
             }
         }
 
-        deltaTime = clock.restart().asSeconds(); // ile minelo od ostatniej petli
+        deltaTime = Clock.restart().asSeconds(); // ile minelo od ostatniej petli
 
         if (gameState == PLAYING) {
             // Update the power-up message timer
@@ -306,7 +318,7 @@ int main() {
             }
 
             // Update global game timer
-            sf::Time gameTime = gameClock.getElapsedTime();
+           sf::Time gameTime = totalTime + gameClock.getElapsedTime();
             gameTimerText.setString("Time: " + std::to_string(static_cast<int>(gameTime.asSeconds())));
 
             // update pozycji
