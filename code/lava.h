@@ -1,4 +1,5 @@
-
+#ifndef LAVA_H
+#define LAVA_H
 #include <SFML/Graphics.hpp>
 
 class Lava {
@@ -20,4 +21,4 @@ private:
     sf::Vector2f initialSize; // Początkowy rozmiar lawy
 };
 
-#endif // LAVA_H
+#endif
