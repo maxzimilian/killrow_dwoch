@@ -4,15 +4,21 @@
 #include "item.h"
 #include "Menu.h"
 #include "lava.h"
+#include "leaderboard.h" // Include leaderboard header
 
-static const float VIEW_HEIGHT = 300.0f; // ustawienie wielkosci okna
+enum GameState {
+    MENU,
+    PLAYING,
+    LEADERBOARD
+};
 
-void resizeView(sf::RenderWindow& window, sf::View& view) { // funkcja do skalowania rozmiaru okna
+static const float VIEW_HEIGHT = 300.0f;
+
+void resizeView(sf::RenderWindow& window, sf::View& view) {
     float aspectRatio = float(window.getSize().x) / float(window.getSize().y);
     view.setSize(VIEW_HEIGHT * aspectRatio, VIEW_HEIGHT);
 }
 
-// funkcja do resetowania gry
 void resetGame(Hero& hero, std::vector<Item>& items, Lava& lava, std::vector<Platform>& platforms, sf::Texture& monsterTexture, const std::vector<std::vector<int>>& monsterAnims, int& points, sf::Text& text, PowerUp& powerUp) {
     points = 0;
     text.setString("Points : " + std::to_string(points));
@@ -31,16 +37,19 @@ int main() {
     sf::View view(sf::Vector2f(0.0f, 0.0f), sf::Vector2f(VIEW_HEIGHT, VIEW_HEIGHT));
 
     Menu menu(VIEW_HEIGHT, VIEW_HEIGHT); // menu gry
-    bool menu_is_open = true; // czy gra ma otwarte okno menu
+    GameState gameState = MENU; // Initial game state
+
     bool end = false; // czy gra juz sie skonczyla
     bool died = false; // czy gracz umarl
     int points = 0; // ilosc zebranych punktow
+
+    Leaderboard leaderboard; // Obiekt leaderboard do śledzenia najlepszych wyników
 
     sf::Font font;
     if (!font.loadFromFile("Pixel.ttf")) { // [utopiafonts] 1999 free font, 1999 utopiafonts. dale_thorpe@bssc.edu.au, https://www.1001fonts.com/pixel-font.html
         return 1;
     }
-    
+
     // tekst z iloscia punktow gracza, ktory bedzie podawany w lewym gornym rogu
     sf::Text text;
     text.setFont(font);
@@ -74,7 +83,7 @@ int main() {
     // napis koncowy gry
     sf::Text congrats;
     congrats.setFont(font);
-    congrats.setString("Congratulations!!!\n You managed to escape\n and get " + std::to_string(points) + " points.");
+    congrats.setString("Congratulations!!!\n You managed to escape\n and get " + std::to_string(points) + " points.\nPress S to Save or E to Exit.");
     congrats.setCharacterSize(64);
     congrats.setScale(0.2, 0.2);
     congrats.setOrigin(sf::Vector2f(500, 250));
@@ -229,7 +238,8 @@ int main() {
                 resizeView(window, view);
                 break;
             case sf::Event::KeyReleased:
-                if (menu_is_open) { // opcje menu
+                switch (gameState) {
+                case MENU: // opcje menu
                     switch (event.key.code) {
                     case sf::Keyboard::W:
                         menu.moveUp();
@@ -240,7 +250,7 @@ int main() {
                     case sf::Keyboard::Return: // enter
                         switch (menu.GetPressedItem()) { // po wybraniu opcji z menu
                         case 0: // wraca do gry
-                            menu_is_open = !menu_is_open;
+                            gameState = PLAYING;
                             menu.closeMenu();
                             if (died || end) {
                                 resetGame(hero, items, lava, platforms, monsterTexture, monsterAnims, points, text, powerUp);
@@ -252,167 +262,206 @@ int main() {
                         case 1: // restartuje gre, poprzez reset punktow, pozycji gracza, wektora itemow oraz zmienienie boola zakonczenia gry
                             resetGame(hero, items, lava, platforms, monsterTexture, monsterAnims, points, text, powerUp);
                             gameClock.restart(); // Restart global timer
-                            menu.closeMenu();
+                            gameState = PLAYING;
                             end = false;
                             died = false;
-                            menu_is_open = false;
                             break;
-                        case 2: // zamyka gre
+                        case 2: // wyświetla tablicę wyników
+                            leaderboard.loadFromFile("leaderboard.txt");
+                            leaderboard.draw(window, font);
+                            gameState = LEADERBOARD;
+                            break;
+                        case 3: // zamyka gre
                             window.close();
                             break;
                         }
+                        break;
+                    case sf::Keyboard::Escape: // escape zeby otworzyc/zamknac menu
+                        window.close();
+                        break;
                     }
-                }
-                if (event.key.code == sf::Keyboard::Escape) { // escape zeby otworzyc/zamknac menu
-                    menu_is_open = !menu_is_open;
-                    menu.closeMenu();
+                    break;
+                case PLAYING: // gra
+                    if (event.key.code == sf::Keyboard::Escape) {
+                        gameState = MENU;
+                    }
+                    break;
+                case LEADERBOARD: // tablica wyników
+                    if (event.key.code == sf::Keyboard::Escape) {
+                        gameState = MENU;
+                    }
+                    break;
                 }
                 break;
-                
             }
         }
 
         deltaTime = clock.restart().asSeconds(); // ile minelo od ostatniej petli
 
-        // Update the power-up message timer
-        if (powerUpMessageTimer > 0.0f) {
-            powerUpMessageTimer -= deltaTime;
-        }
-
-        // Update global game timer
-        sf::Time gameTime = gameClock.getElapsedTime();
-        gameTimerText.setString("Time: " + std::to_string(static_cast<int>(gameTime.asSeconds())));
-
-        // update pozycji
-        sf::Vector2f currentPosition = hero.getPosition();
-
-        if (currentPosition == previousPosition) {
-            idleTime += deltaTime;
-            if (idleTime >= 2.0f && idleTime < 3.0f) {
-                showLavaWarning = true;
+        if (gameState == PLAYING) {
+            // Update the power-up message timer
+            if (powerUpMessageTimer > 0.0f) {
+                powerUpMessageTimer -= deltaTime;
             }
-            if (idleTime >= 3.0f) {
-                lava.IncreaseLevel(10.0f);
+
+            // Update global game timer
+            sf::Time gameTime = gameClock.getElapsedTime();
+            gameTimerText.setString("Time: " + std::to_string(static_cast<int>(gameTime.asSeconds())));
+
+            // update pozycji
+            sf::Vector2f currentPosition = hero.getPosition();
+
+            if (currentPosition == previousPosition) {
+                idleTime += deltaTime;
+                if (idleTime >= 2.0f && idleTime < 3.0f) {
+                    showLavaWarning = true;
+                }
+                if (idleTime >= 3.0f) {
+                    lava.IncreaseLevel(10.0f);
+                    showLavaWarning = false;
+                }
+            } else {
+                idleTime = 0.0f;
+                lava.IncreaseLevel(0.0f);
                 showLavaWarning = false;
             }
-        } else {
-            idleTime = 0.0f;
-            lava.IncreaseLevel(0.0f);
-            showLavaWarning = false;
-        }
 
-        previousPosition = currentPosition;
+            previousPosition = currentPosition;
 
-        hero.Update(deltaTime, event, text);
-        for (Item& item : items) {
-            item.Update(deltaTime);
-        }
-
-        powerUp.Update(deltaTime);  
-
-        lava.Update(deltaTime);
-
-        // Update the power-up timer text
-        if (hero.isPoweredUp()) {
-            powerUpTimerText.setString("Power-Up Time: " + std::to_string(static_cast<int>(hero.getPowerUpTimeLeft())));
-            powerUpTimerText.setPosition(text.getPosition().x, text.getPosition().y + 20);
-        } else {
-            powerUpTimerText.setString("");
-        }
-
-        // sprawdzenie kolizji
-        Collider pCollision = hero.GetCollider();
-        sf::Vector2f direction;
-
-        for (Platform& p : platforms) {
-            if (p.Getcollider().CheckCollison(pCollision, direction, 1.0f)) {
-                hero.OnCollision(direction);
+            hero.Update(deltaTime, event, text);
+            for (Item& item : items) {
+                item.Update(deltaTime);
             }
-        }
 
-        if (plane.Getcollider().CheckCollison(pCollision, direction, 1.0f)) {
-            end = true;
-        }
+            powerUp.Update(deltaTime);  
 
-        for (unsigned int i = 0; i < items.size(); ++i) {
-            if (items[i].Getcollider().CheckCollison(pCollision, direction, 0.0f)) {
-                hero.OnCollision(direction);
-                items.erase(items.begin() + i);
-                ++points;
-                text.setString("Points : " + std::to_string(points));
-                congrats.setString("Congratulations!!!\n You managed to escape\n and get " + std::to_string(points) + " points.");
-                deathMessage.setString("You Died!\nBetter luck next time!\n You collected " + std::to_string(points) + " points.");
+            lava.Update(deltaTime);
+
+            // Update the power-up timer text
+            if (hero.isPoweredUp()) {
+                powerUpTimerText.setString("Power-Up Time: " + std::to_string(static_cast<int>(hero.getPowerUpTimeLeft())));
+                powerUpTimerText.setPosition(text.getPosition().x, text.getPosition().y + 30);
+            } else {
+                powerUpTimerText.setString("");
             }
-        }
 
-        if (powerUp.isActive() && powerUp.GetCollider().CheckCollison(pCollision, direction, 0.0f)) {
-            hero.ApplyPowerUp();
-            powerUp.collect(); // Mark as collected
-            powerUpMessageTimer = 2.0f; // Show message for 2 seconds
-        }
+            // sprawdzenie kolizji
+            Collider pCollision = hero.GetCollider();
+            sf::Vector2f direction;
 
-        if (hero.CheckCollisionWithLava(lava.getBounds())) {
-            end = true;
-            died = true;
-        }
+            for (Platform& p : platforms) {
+                if (p.Getcollider().CheckCollison(pCollision, direction, 1.0f)) {
+                    hero.OnCollision(direction);
+                }
+            }
 
-        if (end) { // scena koncowa
-            view.setCenter(1000, 1000);
-            menu.setPosition(sf::Vector2f(1000, 1000), 300);
-        } else {
-            // ustawianie widoku na gracza
-            view.setCenter(hero.getPosition());
-            menu.setPosition(hero.getPosition(), 300);
+            if (plane.Getcollider().CheckCollison(pCollision, direction, 1.0f)) {
+                end = true;
+                // Dodanie wyniku do tablicy wyników
+                congrats.setString("Congratulations!!!\n You managed to escape\n and get " + std::to_string(points) + " points.\nPress S to Save or E to Exit.");
+            }
 
-            // Update the position of the global game timer text
-            gameTimerText.setPosition(view.getCenter().x - gameTimerText.getGlobalBounds().width / 2, view.getCenter().y - view.getSize().y / 2 + 10);
-        }
+            for (unsigned int i = 0; i < items.size(); ++i) {
+                if (items[i].Getcollider().CheckCollison(pCollision, direction, 0.0f)) {
+                    hero.OnCollision(direction);
+                    items.erase(items.begin() + i);
+                    ++points;
+                    text.setString("Points : " + std::to_string(points));
+                    congrats.setString("Congratulations!!!\n You managed to escape\n and get " + std::to_string(points) + " points.");
+                    deathMessage.setString("You Died!\nBetter luck next time!\n You collected " + std::to_string(points) + " points.");
+                }
+            }
 
-        // czyscimy okno
-        window.clear(sf::Color(80, 40, 120));
-        window.setView(view);
+            if (powerUp.isActive() && powerUp.GetCollider().CheckCollison(pCollision, direction, 0.0f)) {
+                hero.ApplyPowerUp();
+                powerUp.collect(); // Mark as collected
+                powerUpMessageTimer = 2.0f; // Show message for 2 seconds
+            }
 
-        // rysujemy wszystko
-        for (Platform& p : platforms) {
-            p.Draw(window);
-        }
+            if (hero.CheckCollisionWithLava(lava.getBounds())) {
+                end = true;
+                died = true;
+            }
 
-        for (Item& item : items) {
-            item.Draw(window);
-        }
+            if (end) { // scena koncowa
+                view.setCenter(1000, 1000);
+                menu.setPosition(sf::Vector2f(1000, 1000), 300);
+            } else {
+                // ustawianie widoku na gracza
+                view.setCenter(hero.getPosition());
+                menu.setPosition(hero.getPosition(), 300);
 
-        plane.Draw(window);
-        hero.Draw(window);
-        lava.Draw(window);
-        powerUp.Draw(window);
+                // Update the position of the global game timer text
+                gameTimerText.setPosition(view.getCenter().x - gameTimerText.getGlobalBounds().width / 2, view.getCenter().y - view.getSize().y / 2 + 10);
+            }
 
-        window.draw(text);
-        window.draw(powerUpTimerText); // Draw the power-up timer text
-        window.draw(gameTimerText); // Draw the global game timer
-        if (died) {
-            window.draw(deathMessage);
-        } else {
-            window.draw(congrats);
-        }
+            // czyscimy okno
+            window.clear(sf::Color(80, 40, 120));
+            window.setView(view);
 
-        if (showLavaWarning) {
-            lavaWarning.setOrigin(lavaWarning.getLocalBounds().width / 2.0f, lavaWarning.getLocalBounds().height / 2.0f);
-            lavaWarning.setPosition(view.getCenter());
-            window.draw(lavaWarning);
-        }
+            // rysujemy wszystko
+            for (Platform& p : platforms) {
+                p.Draw(window);
+            }
 
-        if (powerUpMessageTimer > 0.0f) {
-            powerUpMessage.setOrigin(powerUpMessage.getLocalBounds().width / 2.0f, powerUpMessage.getLocalBounds().height / 2.0f);
-            powerUpMessage.setPosition(view.getCenter());
-            window.draw(powerUpMessage);
-        }
+            for (Item& item : items) {
+                item.Draw(window);
+            }
 
-        if (menu_is_open) {
+            plane.Draw(window);
+            hero.Draw(window);
+            lava.Draw(window);
+            powerUp.Draw(window);
+
+            window.draw(text);
+            window.draw(powerUpTimerText); // Draw the power-up timer text
+            window.draw(gameTimerText); // Draw the global game timer
+            if (died) {
+                window.draw(deathMessage);
+            } else {
+                window.draw(congrats);
+            }
+
+            if (showLavaWarning) {
+                lavaWarning.setOrigin(lavaWarning.getLocalBounds().width / 2.0f, lavaWarning.getLocalBounds().height / 2.0f);
+                lavaWarning.setPosition(view.getCenter());
+                window.draw(lavaWarning);
+            }
+
+            if (powerUpMessageTimer > 0.0f) {
+                powerUpMessage.setOrigin(powerUpMessage.getLocalBounds().width / 2.0f, powerUpMessage.getLocalBounds().height / 2.0f);
+                powerUpMessage.setPosition(view.getCenter());
+                window.draw(powerUpMessage);
+            }
+
+        } else if (gameState == MENU) {
+            // czyscimy okno
             window.clear(sf::Color(100, 60, 100));
             menu.draw(window);
+        } else if (gameState == LEADERBOARD) {
+            // czyscimy okno
+            window.clear(sf::Color(100, 60, 100));
+            leaderboard.loadFromFile("leaderboard.txt"); // Ensure leaderboard is loaded before drawing
+            leaderboard.draw(window, font);
         }
 
         window.display();
+
+        // Handle post-win options outside of the event polling loop
+        if (end && !died && gameState == PLAYING) {
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
+                std::cout << "Saving score to leaderboard." << std::endl; // Debug statement
+                leaderboard.addEntry(points, gameClock.getElapsedTime().asSeconds());
+                leaderboard.saveToFile("leaderboard.txt"); // Ensure the leaderboard is saved
+                resetGame(hero, items, lava, platforms, monsterTexture, monsterAnims, points, text, powerUp);
+                gameState = MENU;
+                
+            } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::E)) {
+                resetGame(hero, items, lava, platforms, monsterTexture, monsterAnims, points, text, powerUp);
+                gameState = MENU;
+                
+            }
+        }
     }
 
     return 0;
