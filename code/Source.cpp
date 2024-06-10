@@ -220,12 +220,14 @@ int main() {
     Platform plane(&planeTexture, sf::Vector2f(72.0f, 36.0f), sf::Vector2f(50.0f, -20.0f));
 
     // lawa, ktora bedzie sie podnosic
-    Lava lava(&lavaTexture, sf::Vector2f(600.0f, 800.0f), sf::Vector2f(180.0f, 800.0f)); // Initial height 0, expands upwards
+    Lava lava(&lavaTexture, sf::Vector2f(600.0f, 800.0f), sf::Vector2f(250.0f, 800.0f)); // Initial height 0, expands upwards
 
     //power up skoku
     std::vector<std::vector<int>> powerUpAnims;
     powerUpAnims.push_back(std::vector<int>{20, 21, 22});
     PowerUp powerUp(&monsterTexture, sf::Vector2u(4, 48), 0.5f, powerUpAnims, sf::Vector2f(16.0f, 16.0f), sf::Vector2f(240.0f, 200.0f));  
+
+  
 
     float deltaTime = 0.0f; // czas pomiedzy petlami
 

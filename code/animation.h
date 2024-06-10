@@ -1,5 +1,4 @@
-#ifndef ANIMATION_H
-#define ANIMATION_H
+
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
 #include <vector>
@@ -28,5 +27,3 @@ private:
 	float switchTime; //ile ma minac pomiedzy klatkami
 	unsigned int usedAnim; //uzywana klatkad
 };
-
-#endif // ANIMATION_H

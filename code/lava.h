@@ -1,5 +1,3 @@
-#ifndef LAVA_H
-#define LAVA_H
 
 #include <SFML/Graphics.hpp>
 

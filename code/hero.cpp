@@ -1,7 +1,7 @@
 #include "hero.h"
 
 Hero::Hero(sf::Texture* texture, sf::Vector2u imageCount, float switchTime, std::vector<std::vector<int>> allAnims, float speed, float jumpHeight)
-    : animation(texture, imageCount, switchTime, allAnims), startPos(sf::Vector2f(100.0f, -10.0f)) {
+    : animation(texture, imageCount, switchTime, allAnims) {
     this->speed = speed;
     this->anim = 0;
     this->jumpHeight = jumpHeight;

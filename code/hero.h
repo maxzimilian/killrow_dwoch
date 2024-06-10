@@ -1,5 +1,4 @@
-#ifndef HERO_H
-#define HERO_H
+
 #include "animation.h"
 #include "collider.h"
 
@@ -31,12 +30,13 @@ private:
     bool poweredUp;
     float powerUpTimer;
 
-    sf::Vector2f startPos; // początek
-    // sf::Vector2f startPos = sf::Vector2f(180.0f, 650.0f); // przez statkiem - stara mapa
+    sf::Vector2f startPos = sf::Vector2f(180.0f, 650.0f); //pozycja startowa
+	//(180.0f, 650.0f);    //poczatek gry
+	//(100.0f, -10.0f);  //koniec gry (do testowania)
     sf::Vector2f velocity;
+
     bool canJump;
     float jumpHeight;
     float jump;
 };
 
-#endif // HERO_H
