@@ -156,6 +156,7 @@ int main() {
     // animacja "itemow" / potworkow
     std::vector<std::vector<int>> monsterAnims;
     monsterAnims.push_back(std::vector<int>{12, 13, 14, 13});
+    
 
     // wektor wszystkich platform, ktory ulatwi potem wyswietlanie i sprawdzanie kolizji
     std::vector<Platform> platforms;
@@ -222,7 +223,9 @@ int main() {
     Lava lava(&lavaTexture, sf::Vector2f(600.0f, 800.0f), sf::Vector2f(180.0f, 800.0f)); // Initial height 0, expands upwards
 
     //power up skoku
-    PowerUp powerUp(&monsterTexture, sf::Vector2u(4, 48), 0.5f, monsterAnims, sf::Vector2f(16.0f, 16.0f), sf::Vector2f(240.0f, 200.0f));  
+    std::vector<std::vector<int>> powerUpAnims;
+    powerUpAnims.push_back(std::vector<int>{20, 21, 22});
+    PowerUp powerUp(&monsterTexture, sf::Vector2u(4, 48), 0.5f, powerUpAnims, sf::Vector2f(16.0f, 16.0f), sf::Vector2f(240.0f, 200.0f));  
 
     float deltaTime = 0.0f; // czas pomiedzy petlami
 
@@ -280,7 +283,7 @@ int main() {
                 break;
             case 2: // wyświetla tablicę wyników
                 leaderboard.loadFromFile("code/leaderboard.txt"); // Load leaderboard data
-                leaderboard.draw(window, font);
+                //leaderboard.draw(window, font);
                 gameState = LEADERBOARD;
                 break;
             case 3: // zamyka gre
@@ -303,6 +306,7 @@ int main() {
     case LEADERBOARD: // tablica wyników
         if (event.key.code == sf::Keyboard::Escape) {
             gameState = MENU;
+
         }
         break;
     }
@@ -455,8 +459,9 @@ int main() {
         } else if (gameState == LEADERBOARD) {
             // czyscimy okno
             window.clear(sf::Color(100, 60, 100));
-            leaderboard.loadFromFile("code/leaderboard.txt"); // Ensure leaderboard is loaded before drawing
             leaderboard.draw(window, font);
+            leaderboard.loadFromFile("code/leaderboard.txt"); // Ensure leaderboard is loaded before drawing
+            
         }
 
         window.display();
