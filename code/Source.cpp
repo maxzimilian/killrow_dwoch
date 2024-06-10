@@ -280,6 +280,7 @@ int main() {
                 break;
             case 2: // wyświetla tablicę wyników
                 leaderboard.loadFromFile("leaderboard.txt"); // Load leaderboard data
+                leaderboard.draw(window, font);
                 gameState = LEADERBOARD;
                 break;
             case 3: // zamyka gre

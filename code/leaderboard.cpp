@@ -1,7 +1,7 @@
 #include "leaderboard.h"
 #include <cmath>
 Leaderboard::Leaderboard() {
-    loadFromFile("janchalupka/Biurko/studyja/AUTOMATYKA I ROBOTYKA/psio/leaderboard.txt");
+    loadFromFile("code/leaderboard.txt");
 }
 
 void Leaderboard::addEntry(int points, float time) {
@@ -12,7 +12,7 @@ void Leaderboard::addEntry(int points, float time) {
     if (entries.size() > maxEntries) {
         entries.pop_back();
     }
-    saveToFile("janchalupka/Biurko/studyja/AUTOMATYKA I ROBOTYKA/psio/leaderboard.txt");
+    saveToFile("code/leaderboard.txt");
 }
 
 void Leaderboard::draw(sf::RenderWindow& window, sf::Font& font) {
