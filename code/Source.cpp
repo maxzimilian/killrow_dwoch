@@ -11,7 +11,7 @@
 sf::Clock Clock;
 sf::Clock gameClock;
 sf::Time totalTime;
-sf::Time pauseTime; // global timer clock
+sf::Time pauseTime;
 
 enum GameState
 {
@@ -59,7 +59,7 @@ int main()
 
     sf::Font font;
     if (!font.loadFromFile("Pixel.ttf"))
-    { // [utopiafonts] 1999 free font, 1999 utopiafonts. dale_thorpe@bssc.edu.au, https://www.1001fonts.com/pixel-font.html
+    { 
         return 1;
     }
 
@@ -189,7 +189,7 @@ int main()
     platforms.push_back(Platform(&tileTexture, sf::Vector2f(32.0f, 16.0f), sf::Vector2f(272.0f, 264.0f)));
     platforms.push_back(Platform(&tileTexture, sf::Vector2f(16.0f, 16.0f), sf::Vector2f(200.0f, 370.0f)));
     platforms.push_back(Platform(&tileTexture, sf::Vector2f(16.0f, 16.0f), sf::Vector2f(152.0f, 264.0f)));
-    platforms.push_back(Platform(&tileTexture, sf::Vector2f(160.0f, 32.0f), sf::Vector2f(256.0f, 32.0f))); // najwyzsza platforma przy statku - stara
+    platforms.push_back(Platform(&tileTexture, sf::Vector2f(160.0f, 32.0f), sf::Vector2f(256.0f, 32.0f))); 
     platforms.push_back(Platform(&tileTexture, sf::Vector2f(128.0f, 128.0f), sf::Vector2f(448.0f, -64.0f)));
 
     // small Tiles
@@ -540,7 +540,7 @@ int main()
             // czyscimy okno
             window.clear(sf::Color(100, 60, 100));
             leaderboard.draw(window, font);
-            leaderboard.loadFromFile("code/leaderboard.txt"); // Ensure leaderboard is loaded before drawing
+            leaderboard.loadFromFile("code/leaderboard.txt");
         }
 
         window.display();
@@ -550,7 +550,6 @@ int main()
         {
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
             {
-                std::cout << "Saving score to leaderboard." << std::endl; // Debug statement
                 leaderboard.addEntry(points, gameClock.getElapsedTime().asSeconds());
                 leaderboard.saveToFile("code/leaderboard.txt"); // Ensure the leaderboard is saved
                 resetGame(hero, items, lava, platforms, monsterTexture, monsterAnims, points, text, powerUp);
