@@ -8,6 +8,7 @@
 class Leaderboard {
 public:
     Leaderboard();
+    ~Leaderboard();
     void addEntry(int points, float time);
     void draw(sf::RenderWindow& window, sf::Font& font);
     void saveToFile(const std::string& filename);

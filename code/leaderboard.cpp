@@ -1,4 +1,5 @@
 #include "leaderboard.h"
+#include <iostream>
 #include <cmath>
 Leaderboard::Leaderboard() {
     loadFromFile("code/leaderboard.txt");
@@ -60,4 +61,8 @@ void Leaderboard::loadFromFile(const std::string& filename) {
             entries.push_back({ points, time });
         }
     }
+}
+Leaderboard::~Leaderboard() {
+    saveToFile("code/leaderboard.txt");
+    std::cout<<"leaderboard destructor\n";
 }

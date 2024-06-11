@@ -38,16 +38,16 @@ void resetGame(Hero &hero, std::vector<Item> &items, Lava &lava, std::vector<Pla
     items.push_back(Item(&monsterTexture, sf::Vector2u(4, 48), 0.5f, monsterAnims, sf::Vector2f(16.0f, 16.0f), sf::Vector2f(200.0f, 348.0f)));
     items.push_back(Item(&monsterTexture, sf::Vector2u(4, 48), 0.5f, monsterAnims, sf::Vector2f(16.0f, 16.0f), sf::Vector2f(360.0f, 332.0f)));
     items.push_back(Item(&monsterTexture, sf::Vector2u(4, 48), 0.5f, monsterAnims, sf::Vector2f(16.0f, 16.0f), sf::Vector2f(120.0f, -10.0f)));
-    hero.restart();
+    hero.restart(); // You can set the desired start position here
     lava.ResetPosition();
-
     powerUp = PowerUp(&monsterTexture, sf::Vector2u(4, 48), 0.5f, monsterAnims, sf::Vector2f(16.0f, 16.0f), sf::Vector2f(240.0f, 200.0f)); // Resetowanie power-up
 
     // Reset the cannons
     cannons.clear();
     cannons.push_back(Cannon(&cannonTexture, sf::Vector2f(395.0f, -10.0f)));
 
-    leaderboard.loadFromFile("code/leaderboard.txt");
+    // Load leaderboard data
+    leaderboard.loadFromFile("code/leaderboard.txt"); // Add this line
 }
 
 int main()
@@ -551,10 +551,12 @@ int main()
             window.clear(sf::Color(100, 60, 100));
             menu.draw(window);
         }
-        else if (gameState == LEADERBOARD)
+        if (gameState == LEADERBOARD)
         {
             // Clear window
             window.clear(sf::Color(100, 60, 100));
+            //sf::rectangleShape background(sf::Vector2f(50, 50));
+            std::cout << "Drawing leaderboard" << std::endl; // Debug statement
             leaderboard.draw(window, font);
         }
 
@@ -565,6 +567,7 @@ int main()
         {
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
             {
+
                 std::cout << "Saving score to leaderboard." << std::endl; // Debug statement
                 leaderboard.addEntry(points, gameClock.getElapsedTime().asSeconds());
                 leaderboard.saveToFile("code/leaderboard.txt"); // Ensure the leaderboard is saved
