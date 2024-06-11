@@ -29,7 +29,7 @@ void resizeView(sf::RenderWindow &window, sf::View &view)
     view.setSize(VIEW_HEIGHT * aspectRatio, VIEW_HEIGHT);
 }
 
-void resetGame(Hero &hero, std::vector<Item> &items, Lava &lava, std::vector<Platform> &platforms, sf::Texture &monsterTexture, const std::vector<std::vector<int>> &monsterAnims, int &points, sf::Text &text, PowerUp &powerUp, std::vector<Cannon> &cannons, sf::Texture &cannonTexture)
+void resetGame(Hero &hero, std::vector<Item> &items, Lava &lava, std::vector<Platform> &platforms, sf::Texture &monsterTexture, const std::vector<std::vector<int>> &monsterAnims, int &points, sf::Text &text, PowerUp &powerUp, std::vector<Cannon> &cannons, sf::Texture &cannonTexture, Leaderboard &leaderboard)
 {
     points = 0;
     text.setString("Points : " + std::to_string(points));
@@ -46,6 +46,8 @@ void resetGame(Hero &hero, std::vector<Item> &items, Lava &lava, std::vector<Pla
     // Reset the cannons
     cannons.clear();
     cannons.push_back(Cannon(&cannonTexture, sf::Vector2f(395.0f, -10.0f)));
+
+    leaderboard.loadFromFile("code/leaderboard.txt");
 }
 
 int main()
@@ -286,9 +288,9 @@ int main()
                             menu.closeMenu();
                             if (died || end)
                             {
-                                resetGame(hero, items, lava, platforms, monsterTexture, monsterAnims, points, text, powerUp, cannons, cannonTexture);
-                                totalTime = sf::Time::Zero; // Reset total time
-                                gameClock.restart();        // Restart global timer
+                                resetGame(hero, items, lava, platforms, monsterTexture, monsterAnims, points, text, powerUp, cannons, cannonTexture, leaderboard); // Pass leaderboard
+                                totalTime = sf::Time::Zero;                                                                                                        // Reset total time
+                                gameClock.restart();                                                                                                               // Restart global timer
                                 end = false;
                                 died = false;
                             }
@@ -297,18 +299,16 @@ int main()
                                 gameClock.restart(); // Restart clock for resuming the game
                             }
                             break;
-                        case 1: // restartuje gre
-                            resetGame(hero, items, lava, platforms, monsterTexture, monsterAnims, points, text, powerUp, cannons, cannonTexture);
-                            totalTime = sf::Time::Zero; // Reset total time
-                            gameClock.restart();        // Restart global timer
+                        case 1:                                                                                                                                // restartuje gre
+                            resetGame(hero, items, lava, platforms, monsterTexture, monsterAnims, points, text, powerUp, cannons, cannonTexture, leaderboard); // Pass leaderboard
+                            totalTime = sf::Time::Zero;                                                                                                        // Reset total time
+                            gameClock.restart();                                                                                                               // Restart global timer
                             gameState = PLAYING;
                             end = false;
                             died = false;
                             break;
-
                         case 2:                                               // wyświetla tablicę wyników
-                            leaderboard.loadFromFile("code/leaderboard.txt"); // Load leaderboard data
-                            // leaderboard.draw(window, font);
+                            leaderboard.loadFromFile("code/leaderboard.txt"); // Load leaderboard data before showing
                             gameState = LEADERBOARD;
                             break;
                         case 3: // zamyka gre
@@ -316,6 +316,7 @@ int main()
                             break;
                         }
                         break;
+
                     case sf::Keyboard::Escape:
                         window.close();
                         break;
@@ -552,10 +553,9 @@ int main()
         }
         else if (gameState == LEADERBOARD)
         {
-            // czyscimy okno
+            // Clear window
             window.clear(sf::Color(100, 60, 100));
             leaderboard.draw(window, font);
-            leaderboard.loadFromFile("code/leaderboard.txt"); // Ensure leaderboard is loaded before drawing
         }
 
         window.display();
@@ -568,12 +568,11 @@ int main()
                 std::cout << "Saving score to leaderboard." << std::endl; // Debug statement
                 leaderboard.addEntry(points, gameClock.getElapsedTime().asSeconds());
                 leaderboard.saveToFile("code/leaderboard.txt"); // Ensure the leaderboard is saved
-                resetGame(hero, items, lava, platforms, monsterTexture, monsterAnims, points, text, powerUp, cannons, cannonTexture);
-                gameState = MENU;
+                gameState = MENU;                               // Change game state to MENU
             }
             else if (sf::Keyboard::isKeyPressed(sf::Keyboard::E))
             {
-                resetGame(hero, items, lava, platforms, monsterTexture, monsterAnims, points, text, powerUp, cannons, cannonTexture);
+                resetGame(hero, items, lava, platforms, monsterTexture, monsterAnims, points, text, powerUp, cannons, cannonTexture, leaderboard); // Pass leaderboard
                 gameState = MENU;
             }
         }

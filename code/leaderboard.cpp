@@ -16,18 +16,29 @@ void Leaderboard::addEntry(int points, float time) {
 }
 
 void Leaderboard::draw(sf::RenderWindow& window, sf::Font& font) {
-    sf::Text title("Leaderboard", font, 20);
+    sf::Vector2u windowSize = window.getSize();
+    float titleFontSize = static_cast<float>(windowSize.y) / 20.0f; // Title font size based on window height
+    float entryFontSize = static_cast<float>(windowSize.y) / 30.0f; // Entry font size based on window height
+    float yOffset = static_cast<float>(windowSize.y) / 15.0f; // Vertical offset for entries
+
+    sf::Text title("Leaderboard", font, static_cast<unsigned int>(titleFontSize));
     title.setFillColor(sf::Color::White);
-    title.setPosition(10, 50);
+    title.setOutlineColor(sf::Color::Black);
+    title.setOutlineThickness(1);
+    title.setPosition(windowSize.x / 2.0f - title.getGlobalBounds().width / 2.0f, windowSize.y * 0.1f); // Center title horizontally
     window.draw(title);
 
-    for (size_t i = 0; i < entries.size(); ++i) {
-        sf::Text entryText(std::to_string(i + 1) + ". Points: " + std::to_string(entries[i].points) + " Time: " + std::to_string(entries[i].time), font, 18);
+    for (size_t i = 0; i < entries.size() && i < 10; ++i) { // Display top 10 entries
+        sf::Text entryText(std::to_string(i + 1) + ". Points: " + std::to_string(entries[i].points) + " Time: " + std::to_string(entries[i].time), font, static_cast<unsigned int>(entryFontSize));
         entryText.setFillColor(sf::Color::White);
-        entryText.setPosition(20, 100 + i * 30);
+        entryText.setOutlineColor(sf::Color::Black);
+        entryText.setOutlineThickness(1);
+        entryText.setPosition(windowSize.x / 2.0f - entryText.getGlobalBounds().width / 2.0f, windowSize.y * 0.1f + titleFontSize + i * yOffset); // Center entries horizontally
         window.draw(entryText);
     }
 }
+
+
 
 void Leaderboard::saveToFile(const std::string& filename) {
     std::ofstream file(filename);
