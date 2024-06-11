@@ -1,17 +1,18 @@
+
 #include "hero.h"
 #include "powerup.h"
 #include "platform.h"
 #include "item.h"
 #include "Menu.h"
 #include "lava.h"
+#include "leaderboard.h"
 #include "cannon.h"
 #include "cannonball.h"
-#include "leaderboard.h"
 
 sf::Clock Clock;
 sf::Clock gameClock;
 sf::Time totalTime;
-sf::Time pauseTime;
+sf::Time pauseTime; // global timer clock
 
 enum GameState
 {
@@ -28,7 +29,7 @@ void resizeView(sf::RenderWindow &window, sf::View &view)
     view.setSize(VIEW_HEIGHT * aspectRatio, VIEW_HEIGHT);
 }
 
-void resetGame(Hero &hero, std::vector<Item> &items, Lava &lava, std::vector<Platform> &platforms, sf::Texture &monsterTexture, const std::vector<std::vector<int>> &monsterAnims, int &points, sf::Text &text, PowerUp &powerUp)
+void resetGame(Hero &hero, std::vector<Item> &items, Lava &lava, std::vector<Platform> &platforms, sf::Texture &monsterTexture, const std::vector<std::vector<int>> &monsterAnims, int &points, sf::Text &text, PowerUp &powerUp, std::vector<Cannon> &cannons, sf::Texture &cannonTexture)
 {
     points = 0;
     text.setString("Points : " + std::to_string(points));
@@ -41,6 +42,10 @@ void resetGame(Hero &hero, std::vector<Item> &items, Lava &lava, std::vector<Pla
     lava.ResetPosition();
 
     powerUp = PowerUp(&monsterTexture, sf::Vector2u(4, 48), 0.5f, monsterAnims, sf::Vector2f(16.0f, 16.0f), sf::Vector2f(240.0f, 200.0f)); // Resetowanie power-up
+
+    // Reset the cannons
+    cannons.clear();
+    cannons.push_back(Cannon(&cannonTexture, sf::Vector2f(395.0f, -10.0f)));
 }
 
 int main()
@@ -59,7 +64,7 @@ int main()
 
     sf::Font font;
     if (!font.loadFromFile("Pixel.ttf"))
-    { 
+    { // [utopiafonts] 1999 free font, 1999 utopiafonts. dale_thorpe@bssc.edu.au, https://www.1001fonts.com/pixel-font.html
         return 1;
     }
 
@@ -147,9 +152,9 @@ int main()
         !monsterTexture.loadFromFile("textures/monsters.png") ||
         !planeTexture.loadFromFile("textures/plane.png") ||
         !lavaTexture.loadFromFile("textures/lava.png") ||
-        !cannonballTexture.loadFromFile("textures/cannonball.png") ||
+        !cannonballTexture.loadFromFile("textures/cannonball.png") || // Fixed cannonball texture load
         !cannonTexture.loadFromFile("textures/cannon.png"))
-    {
+    { // Added cannon texture load
         return 1;
     }
 
@@ -169,9 +174,9 @@ int main()
     // wektor wszystkich platform, ktory ulatwi potem wyswietlanie i sprawdzanie kolizji
     std::vector<Platform> platforms;
     // tiles
-    platforms.push_back(Platform(&tileTexture, sf::Vector2f(512.0f, 160.0f), sf::Vector2f(256.0f, 800.0f)));  // dolna ściana
-    platforms.push_back(Platform(&tileTexture, sf::Vector2f(288.0f, 1000.0f), sf::Vector2f(0.0f, 500.0f)));   // lewa 144 800  72 400 - stara
-    platforms.push_back(Platform(&tileTexture, sf::Vector2f(288.0f, 1000.0f), sf::Vector2f(512.0f, 400.0f))); // prawa
+    platforms.push_back(Platform(&tileTexture, sf::Vector2f(512.0f, 160.0f), sf::Vector2f(256.0f, 800.0f))); // dolna ściana
+    platforms.push_back(Platform(&tileTexture, sf::Vector2f(288.0f, 1000.0f), sf::Vector2f(0.0f, 500.0f)));  // lewa 144 800  72 400 - stara
+    platforms.push_back(Platform(&tileTexture, sf::Vector2f(288.0f, 800.0f), sf::Vector2f(512.0f, 400.0f))); // prawa
     platforms.push_back(Platform(&tileTexture, sf::Vector2f(32.0f, 128.0f), sf::Vector2f(160.0f, 704.0f)));
     platforms.push_back(Platform(&tileTexture, sf::Vector2f(32.0f, 32.0f), sf::Vector2f(208.0f, 656.0f)));
     platforms.push_back(Platform(&tileTexture, sf::Vector2f(32.0f, 32.0f), sf::Vector2f(288.0f, 704.0f)));
@@ -189,8 +194,7 @@ int main()
     platforms.push_back(Platform(&tileTexture, sf::Vector2f(32.0f, 16.0f), sf::Vector2f(272.0f, 264.0f)));
     platforms.push_back(Platform(&tileTexture, sf::Vector2f(16.0f, 16.0f), sf::Vector2f(200.0f, 370.0f)));
     platforms.push_back(Platform(&tileTexture, sf::Vector2f(16.0f, 16.0f), sf::Vector2f(152.0f, 264.0f)));
-    platforms.push_back(Platform(&tileTexture, sf::Vector2f(160.0f, 32.0f), sf::Vector2f(256.0f, 32.0f))); 
-    platforms.push_back(Platform(&tileTexture, sf::Vector2f(128.0f, 128.0f), sf::Vector2f(448.0f, -64.0f)));
+    platforms.push_back(Platform(&tileTexture, sf::Vector2f(160.0f, 32.0f), sf::Vector2f(256.0f, 32.0f))); // najwyzsza platforma przy statku - stara
 
     // small Tiles
     platforms.push_back(Platform(&sTileTexture, sf::Vector2f(8.0f, 8.0f), sf::Vector2f(290.0f, 600.0f)));
@@ -234,8 +238,11 @@ int main()
     std::vector<std::vector<int>> powerUpAnims;
     powerUpAnims.push_back(std::vector<int>{20, 21, 22});
     PowerUp powerUp(&monsterTexture, sf::Vector2u(4, 48), 0.5f, powerUpAnims, sf::Vector2f(16.0f, 16.0f), sf::Vector2f(240.0f, 200.0f));
-    // cannon
-    Cannon cannon(&monsterTexture, sf::Vector2f(50.0f, -50.0f));
+
+    // Vector of cannons
+    std::vector<Cannon> cannons;
+    cannons.push_back(Cannon(&cannonTexture, sf::Vector2f(395.0f, -10.0f)));
+
     std::vector<Cannonball> cannonballs;
 
     float deltaTime = 0.0f; // czas pomiedzy petlami
@@ -279,7 +286,7 @@ int main()
                             menu.closeMenu();
                             if (died || end)
                             {
-                                resetGame(hero, items, lava, platforms, monsterTexture, monsterAnims, points, text, powerUp);
+                                resetGame(hero, items, lava, platforms, monsterTexture, monsterAnims, points, text, powerUp, cannons, cannonTexture);
                                 totalTime = sf::Time::Zero; // Reset total time
                                 gameClock.restart();        // Restart global timer
                                 end = false;
@@ -291,13 +298,14 @@ int main()
                             }
                             break;
                         case 1: // restartuje gre
-                            resetGame(hero, items, lava, platforms, monsterTexture, monsterAnims, points, text, powerUp);
+                            resetGame(hero, items, lava, platforms, monsterTexture, monsterAnims, points, text, powerUp, cannons, cannonTexture);
                             totalTime = sf::Time::Zero; // Reset total time
                             gameClock.restart();        // Restart global timer
                             gameState = PLAYING;
                             end = false;
                             died = false;
                             break;
+
                         case 2:                                               // wyświetla tablicę wyników
                             leaderboard.loadFromFile("code/leaderboard.txt"); // Load leaderboard data
                             // leaderboard.draw(window, font);
@@ -472,6 +480,44 @@ int main()
             lava.Draw(window);
             powerUp.Draw(window);
 
+            // Update cannons
+            for (auto &cannon : cannons)
+            {
+                cannon.Update(deltaTime, hero.getPosition(), cannonballs, &cannonballTexture);
+                cannon.Draw(window);
+            }
+
+            // Update cannonballs
+            for (size_t i = 0; i < cannonballs.size(); ++i)
+            {
+                cannonballs[i].Update(deltaTime, platforms);
+                if (cannonballs[i].isOffScreen() || cannonballs[i].hasHitPlayer())
+                {
+                    cannonballs.erase(cannonballs.begin() + i);
+                    --i;
+                }
+            }
+
+            // Check collisions with hero
+            for (auto &cannonball : cannonballs)
+            {
+                Collider cannonballCollider = cannonball.GetCollider(); // Store the collider in a variable
+                Collider heroCollider = hero.GetCollider();             // Store the collider in a variable
+
+                if (cannonballCollider.CheckCollison(heroCollider, direction, 0.0f))
+                { // Use the variables
+                    cannonball.markHitPlayer();
+                    end = true;
+                    died = true;
+                    std::cout << "hit" << std::endl;
+                }
+            }
+
+            for (auto &cannonball : cannonballs)
+            {
+                cannonball.Draw(window);
+            }
+
             window.draw(text);
             window.draw(powerUpTimerText); // Draw the power-up timer text
             window.draw(gameTimerText);    // Draw the global game timer
@@ -497,38 +543,7 @@ int main()
                 powerUpMessage.setPosition(view.getCenter());
                 window.draw(powerUpMessage);
             }
-
-            for (size_t i = 0; i < cannonballs.size(); ++i)
-            {
-                cannonballs[i].Update(deltaTime, platforms);
-                if (cannonballs[i].isOffScreen() || cannonballs[i].hasHitPlayer())
-                {
-                    cannonballs.erase(cannonballs.begin() + i);
-                    --i;
-                }
-            }
-            // Check collisions with hero
-            // Inside the game loop, where you check collisions with cannonballs
-            for (auto &cannonball : cannonballs)
-            {
-                Collider cannonballCollider = cannonball.GetCollider(); // Store the collider in a variable
-                Collider heroCollider = hero.GetCollider();             // Store the collider in a variable
-
-                if (cannonballCollider.CheckCollison(heroCollider, direction, 0.0f))
-                { // Use the variables
-                    cannonball.markHitPlayer();
-                    died = true;
-                }
-            }
-
-            // Drawing cannon and cannonballs
-            cannon.Draw(window);
-            for (auto &cannonball : cannonballs)
-            {
-                cannonball.Draw(window);
-            }
         }
-
         else if (gameState == MENU)
         {
             // czyscimy okno
@@ -540,7 +555,7 @@ int main()
             // czyscimy okno
             window.clear(sf::Color(100, 60, 100));
             leaderboard.draw(window, font);
-            leaderboard.loadFromFile("code/leaderboard.txt");
+            leaderboard.loadFromFile("code/leaderboard.txt"); // Ensure leaderboard is loaded before drawing
         }
 
         window.display();
@@ -550,14 +565,15 @@ int main()
         {
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
             {
+                std::cout << "Saving score to leaderboard." << std::endl; // Debug statement
                 leaderboard.addEntry(points, gameClock.getElapsedTime().asSeconds());
                 leaderboard.saveToFile("code/leaderboard.txt"); // Ensure the leaderboard is saved
-                resetGame(hero, items, lava, platforms, monsterTexture, monsterAnims, points, text, powerUp);
+                resetGame(hero, items, lava, platforms, monsterTexture, monsterAnims, points, text, powerUp, cannons, cannonTexture);
                 gameState = MENU;
             }
             else if (sf::Keyboard::isKeyPressed(sf::Keyboard::E))
             {
-                resetGame(hero, items, lava, platforms, monsterTexture, monsterAnims, points, text, powerUp);
+                resetGame(hero, items, lava, platforms, monsterTexture, monsterAnims, points, text, powerUp, cannons, cannonTexture);
                 gameState = MENU;
             }
         }

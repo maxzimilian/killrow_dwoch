@@ -2,7 +2,7 @@
 #include "platform.h" // Include the Platform header if not already included
 
 Cannonball::Cannonball(sf::Texture* texture, sf::Vector2f position, sf::Vector2f direction)
-    : velocity(direction * 300.0f), hitPlayer(false) {
+    : velocity(direction * 100.0f), hitPlayer(false) {
     body.setSize(sf::Vector2f(10.0f, 10.0f));
     body.setTexture(texture);
     body.setPosition(position);
