@@ -29,7 +29,7 @@ void resizeView(sf::RenderWindow &window, sf::View &view)
     view.setSize(VIEW_HEIGHT * aspectRatio, VIEW_HEIGHT);
 }
 
-void resetGame(Hero &hero, std::vector<Item> &items, Lava &lava, std::vector<Platform> &platforms, sf::Texture &monsterTexture, const std::vector<std::vector<int>> &monsterAnims, int &points, sf::Text &text, PowerUp &powerUp, std::vector<Cannon> &cannons, sf::Texture &cannonTexture, Leaderboard &leaderboard)
+void resetGame(Hero &hero, std::vector<Item> &items, Lava &lava, std::vector<Platform> &platforms, sf::Texture &monsterTexture, const std::vector<std::vector<int>> &monsterAnims, int &points, sf::Text &text, PowerUp &powerUp, std::vector<Cannon> &cannons, sf::Texture &cannonTexture, Leaderboard &leaderboard, std::vector<Cannonball> &cannonballs)
 {
     points = 0;
     text.setString("Points : " + std::to_string(points));
@@ -48,6 +48,7 @@ void resetGame(Hero &hero, std::vector<Item> &items, Lava &lava, std::vector<Pla
     cannons.clear();
     cannons.push_back(Cannon(&cannonTexture, sf::Vector2f(395.0f, -10.0f)));
 
+    cannonballs.clear(); // Clear cannonballs
     // Load leaderboard data
     leaderboard.loadFromFile("code/leaderboard.txt"); // Add this line
 }
@@ -290,7 +291,7 @@ int main()
                             menu.closeMenu();
                             if (died || end)
                             {
-                                resetGame(hero, items, lava, platforms, monsterTexture, monsterAnims, points, text, powerUp, cannons, cannonTexture, leaderboard); // Pass leaderboard
+                                resetGame(hero, items, lava, platforms, monsterTexture, monsterAnims, points, text, powerUp, cannons, cannonTexture, leaderboard, cannonballs); // Pass leaderboard
                                 totalTime = sf::Time::Zero;                                                                                                        // Reset total time
                                 gameClock.restart();                                                                                                               // Restart global timer
                                 end = false;
@@ -302,7 +303,7 @@ int main()
                             }
                             break;
                         case 1:                                                                                                                                // restartuje gre
-                            resetGame(hero, items, lava, platforms, monsterTexture, monsterAnims, points, text, powerUp, cannons, cannonTexture, leaderboard); // Pass leaderboard
+                            resetGame(hero, items, lava, platforms, monsterTexture, monsterAnims, points, text, powerUp, cannons, cannonTexture, leaderboard, cannonballs); // Pass leaderboard
                             totalTime = sf::Time::Zero;                                                                                                        // Reset total time
                             gameClock.restart();                                                                                                               // Restart global timer
                             gameState = PLAYING;
@@ -569,7 +570,7 @@ int main()
             int pEnd = points;
             float tEnd = gameClock.getElapsedTime().asSeconds();
            
-            resetGame(hero, items, lava, platforms, monsterTexture, monsterAnims, points, text, powerUp, cannons, cannonTexture, leaderboard);
+            resetGame(hero, items, lava, platforms, monsterTexture, monsterAnims, points, text, powerUp, cannons, cannonTexture, leaderboard, cannonballs);
 
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
             {
