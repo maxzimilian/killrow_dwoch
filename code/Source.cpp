@@ -555,7 +555,6 @@ int main()
         {
             // Clear window
             window.clear(sf::Color(100, 60, 100));
-            //sf::rectangleShape background(sf::Vector2f(50, 50));
             std::cout << "Drawing leaderboard" << std::endl; // Debug statement
             leaderboard.draw(window, font);
         }
@@ -564,18 +563,22 @@ int main()
 
         // Handle post-win options outside of the event polling loop
         if (end && !died && gameState == PLAYING)
-        {
+        {   
+            int pEnd = points;
+            float tEnd = gameClock.getElapsedTime().asSeconds();
+           
+            resetGame(hero, items, lava, platforms, monsterTexture, monsterAnims, points, text, powerUp, cannons, cannonTexture, leaderboard);
+
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
             {
-
                 std::cout << "Saving score to leaderboard." << std::endl; // Debug statement
-                leaderboard.addEntry(points, gameClock.getElapsedTime().asSeconds());
-                leaderboard.saveToFile("code/leaderboard.txt"); // Ensure the leaderboard is saved
+                leaderboard.addEntry(pEnd, tEnd);
+                leaderboard.saveToFile("code/leaderboard.txt");
                 gameState = MENU;                               // Change game state to MENU
             }
             else if (sf::Keyboard::isKeyPressed(sf::Keyboard::E))
             {
-                resetGame(hero, items, lava, platforms, monsterTexture, monsterAnims, points, text, powerUp, cannons, cannonTexture, leaderboard); // Pass leaderboard
+                
                 gameState = MENU;
             }
         }
