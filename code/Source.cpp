@@ -40,7 +40,9 @@ void resetGame(Hero &hero, std::vector<Item> &items, Lava &lava, std::vector<Pla
     items.push_back(Item(&monsterTexture, sf::Vector2u(4, 48), 0.5f, monsterAnims, sf::Vector2f(16.0f, 16.0f), sf::Vector2f(120.0f, -10.0f)));
     hero.restart(); // You can set the desired start position here
     lava.ResetPosition();
-    powerUp = PowerUp(&monsterTexture, sf::Vector2u(4, 48), 0.5f, monsterAnims, sf::Vector2f(16.0f, 16.0f), sf::Vector2f(240.0f, 200.0f)); // Resetowanie power-up
+    std::vector<std::vector<int>> powerUpAnims;
+    powerUpAnims.push_back(std::vector<int>{20, 21, 22});
+    powerUp = PowerUp(&monsterTexture, sf::Vector2u(4, 48), 0.5f, powerUpAnims, sf::Vector2f(16.0f, 16.0f), sf::Vector2f(240.0f, 200.0f)); // Resetowanie power-up
 
     // Reset the cannons
     cannons.clear();
