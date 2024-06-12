@@ -29,7 +29,6 @@ void Leaderboard::draw(sf::RenderWindow& window, sf::Font& font) {
     title.setOutlineThickness(1);
     title.setPosition(windowSize.x / 2.0f - title.getGlobalBounds().width / 2.0f, windowSize.y * 0.1f); // Center title horizontally
     window.draw(title);
-    std::cout<<le
 
 
     for (size_t i = 0; i < entries.size() && i < 10; ++i) { // Display top 10 entries
